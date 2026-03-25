@@ -1,3 +1,4 @@
+```html
 <!doctype html>
 <html lang="ru">
   <head>
@@ -33,7 +34,6 @@
         padding: 20px;
       }
 
-      /* Карточка с полупрозрачным фоном, чтобы фон был виден, но текст читаем */
       .quiz-card {
         max-width: 800px;
         width: 100%;
@@ -86,6 +86,7 @@
         padding: 20px 18px;
         border-radius: 40px;
         text-shadow: 0 1px 2px black;
+        word-break: break-word;
       }
 
       .answers-grid {
@@ -107,6 +108,7 @@
         text-align: center;
         box-shadow: 0 5px 0 #1f1a12;
         font-family: inherit;
+        word-break: break-word;
       }
       .answer-btn:hover:not(:disabled) {
         background: #5f4630;
@@ -197,6 +199,37 @@
         }
       }
 
+      .reward-panel {
+        text-align: center;
+        margin-top: 20px;
+        background: rgba(0, 0, 0, 0.8);
+        border-radius: 48px;
+        padding: 20px;
+      }
+      .reward-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+      }
+      .reward-btn {
+        background: #ffcd00;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.2s;
+        color: #1f2a13;
+        box-shadow: 0 4px 0 #b87d00;
+      }
+      .reward-btn:hover {
+        background: #ffde6e;
+        transform: translateY(-2px);
+      }
+
       .final-panel {
         text-align: center;
         margin-top: 20px;
@@ -242,19 +275,34 @@
         pointer-events: none;
         z-index: 999;
       }
+
       @media (max-width: 600px) {
         .quiz-card {
           padding: 20px 16px;
         }
         .question-text {
           font-size: 1.3rem;
+          padding: 16px;
         }
         .answer-btn {
-          font-size: 0.85rem;
-          padding: 12px;
+          font-size: 0.9rem;
+          padding: 14px 10px;
+        }
+        .answers-grid {
+          gap: 12px;
+          margin: 24px 0;
         }
         .super-game-message {
           font-size: 1.2rem;
+          padding: 10px;
+        }
+        .next-btn {
+          padding: 10px 30px;
+          font-size: 1.2rem;
+        }
+        .final-box {
+          font-size: 1.2rem;
+          padding: 20px;
         }
       }
     </style>
@@ -273,8 +321,8 @@
     </div>
 
     <script>
-      // Вопросы согласно списку (с правильными индексами)
-      const questions = [
+      // ------------------- ВОПРОСЫ (10 базовых) -------------------
+      const baseQuestions = [
         {
           text: "Какой вид спорта считается «номером один» в Осетии по количеству олимпийских чемпионов?",
           options: [
@@ -296,9 +344,14 @@
           correct: 3,
         },
         {
-          text: "Как называется самое глубокое карстовое озеро в Осетии?",
-          options: ["Церик-Кёль", "Зеркальное", "Хуцъе", "Колка"],
-          correct: 0,
+          text: "К какой языковой группе относится осетинский язык?",
+          options: [
+            "Тюркской",
+            "Нахско-дагестанской",
+            "Иранской",
+            "Картвельской",
+          ],
+          correct: 2,
         },
         {
           text: "Какое ущелье Осетии печально известно из-за схода ледника Колка в 2002 году?",
@@ -320,11 +373,15 @@
           ],
           correct: 1,
         },
-        // Супер игра — следующие вопросы
         {
-          text: "В каком году во Владикавказе был открыт первый на Кавказе трамвай?",
-          options: ["1890", "1904", "1917", "1925"],
-          correct: 1,
+          text: "Кто из осетинских военачальников стал единственным в истории СССР дважды Героем Советского Союза и Героем Монгольской Народной Республики?",
+          options: [
+            "Хаджи-Умар Мамсуров",
+            "Георгий Хетагуров",
+            "Исса Плиев",
+            "Энвер Ахсаров",
+          ],
+          correct: 2,
         },
         {
           text: "Какой российский император посетил Владикавказ в 1888 году?",
@@ -343,16 +400,22 @@
         },
       ];
 
-      // Состояние игры
+      // Супер-вопрос (11-й) про трамвай
+      const superQuestion = {
+        text: "В каком году во Владикавказе был открыт первый на Кавказе трамвай?",
+        options: ["1890", "1904", "1917", "1925"],
+        correct: 1,
+      };
+
+      let questions = [...baseQuestions];
       let currentIndex = 0;
       let userAnswers = new Array(questions.length).fill(null);
       let answered = false;
       let waitingNext = false;
       let gameActive = true;
       let gameFinished = false;
-      let mistakeCount = 0; // количество ошибок
-      const MAX_MISTAKES = 1; // разрешена только 1 ошибка, вторая заканчивает игру
-      let superGameShown = false; // флаг, чтобы показать надпись только один раз после 7-го вопроса
+      let mistakeCount = 0;
+      let superGameMode = false; // активна ли супер-игра
 
       // Функция для салюта
       function burstConfetti(intensity = "medium") {
@@ -424,13 +487,13 @@
         gameFinished = true;
         const mainDiv = document.getElementById("gameMainArea");
         mainDiv.innerHTML = `
-            <div class="final-panel">
-                <div class="final-box" style="background: #ffe0cc; color:#8b3c1c;">
-                    😔 Вторая ошибка! Игра окончена. 😔<br>
-                    В следующий раз повезёт больше!
-                </div>
-                <button class="restart-btn" id="restartGameBtn">🔄 Начать заново</button>
+          <div class="final-panel">
+            <div class="final-box" style="background: #ffe0cc; color:#8b3c1c;">
+              😔 Вторая ошибка! Игра окончена. 😔<br>
+              В следующий раз повезёт больше!
             </div>
+            <button class="restart-btn" id="restartGameBtn">🔄 Начать заново</button>
+          </div>
         `;
         document
           .getElementById("restartGameBtn")
@@ -450,7 +513,6 @@
         if (!isCorrect) {
           mistakeCount++;
           if (mistakeCount === 1) {
-            // первая ошибка – предупреждение
             document.getElementById("resultMsg").innerHTML =
               "⚠️ Одна ошибка прощается! Следующая ошибка завершит игру. ⚠️";
             document.getElementById("resultMsg").style.color = "#ffbc9a";
@@ -474,36 +536,54 @@
         }
       }
 
-      // Переход к следующему вопросу
       function goToNext() {
         if (!gameActive || !waitingNext || gameFinished) return;
 
-        // Если только что завершили 7-й вопрос (индекс 6) и ещё не показывали надпись, добавляем "СУПЕР ИГРА"
-        if (currentIndex === 6 && !superGameShown) {
-          superGameShown = true;
-          // Показываем сообщение о супер-игре
-          const resultDiv = document.getElementById("resultMsg");
-          const superDiv = document.createElement("div");
-          superDiv.className = "super-game-message";
-          superDiv.innerText = "🔥 СУПЕР ИГРА 🔥";
-          // Вставляем перед областью ответов (после результата)
-          const nextArea = document.querySelector(".next-area");
-          const existingSuper = document.querySelector(".super-game-message");
-          if (existingSuper) existingSuper.remove();
-          nextArea.parentNode.insertBefore(superDiv, nextArea);
-          // небольшой салют для эффекта
-          burstConfetti("big");
-          // задержка перед переходом к следующему вопросу, чтобы игрок увидел сообщение
-          setTimeout(() => {
-            proceedToNext();
-          }, 1500);
+        // Если мы в супер-игре и это последний вопрос (индекс 10), то завершаем с проверкой
+        if (superGameMode && currentIndex === questions.length - 1) {
+          const isCorrect =
+            userAnswers[currentIndex] === questions[currentIndex].correct;
+          if (isCorrect) {
+            burstConfetti("huge");
+            for (let i = 0; i < 3; i++)
+              setTimeout(() => burstConfetti("big"), i * 350);
+            const mainDiv = document.getElementById("gameMainArea");
+            mainDiv.innerHTML = `
+              <div class="final-panel">
+                <div class="final-box" style="background: gold; color:#2d2b1f;">
+                  🎉✨ ПОБЕДА! ✨🎉<br>
+                  Вы ответили правильно на супер-вопрос!<br>
+                  🏆 ВЫ ВЫИГРАЛИ 100$! 🏆<br>
+                  Спасибо за игру!
+                </div>
+                <button class="restart-btn" id="restartGameBtn">🔄 Пройти викторину снова</button>
+              </div>
+            `;
+            document
+              .getElementById("restartGameBtn")
+              ?.addEventListener("click", () => location.reload());
+          } else {
+            // Неправильно – выигрыш обнуляется
+            const mainDiv = document.getElementById("gameMainArea");
+            mainDiv.innerHTML = `
+              <div class="final-panel">
+                <div class="final-box" style="background: #ffe0cc; color:#8b3c1c;">
+                  😔 Вы ответили неправильно на супер-вопрос. Ваш выигрыш обнуляется. 😔<br>
+                  Попробуйте ещё раз!
+                </div>
+                <button class="restart-btn" id="restartGameBtn">🔄 Пройти викторину снова</button>
+              </div>
+            `;
+            document
+              .getElementById("restartGameBtn")
+              ?.addEventListener("click", () => location.reload());
+          }
+          gameActive = false;
+          gameFinished = true;
           return;
         }
 
-        proceedToNext();
-      }
-
-      function proceedToNext() {
+        // Обычный переход к следующему вопросу
         if (currentIndex + 1 < questions.length) {
           currentIndex++;
           answered = false;
@@ -515,59 +595,117 @@
           }
           renderCurrentQuestion();
         } else {
-          finishGame();
+          // Все вопросы базовой части пройдены
+          if (!superGameMode) {
+            const total = baseQuestions.length;
+            let correctCount = 0;
+            for (let i = 0; i < total; i++) {
+              if (userAnswers[i] === baseQuestions[i].correct) correctCount++;
+            }
+            if (mistakeCount <= 1 && correctCount >= 9) {
+              showIntermediateReward();
+            } else {
+              finishGameWithLoss();
+            }
+          }
         }
       }
 
-      // Завершение игры после прохождения всех вопросов
-      function finishGame() {
-        gameActive = false;
-        gameFinished = true;
-
-        // Подсчёт правильных ответов
-        let correctCount = 0;
-        for (let i = 0; i < questions.length; i++) {
-          if (userAnswers[i] === questions[i].correct) correctCount++;
-        }
-        const total = questions.length;
-
-        // Условие победы: прошли все вопросы и количество ошибок <= 1
-        const win = mistakeCount <= 1 && correctCount === total;
-
+      // Показать промежуточное вознаграждение после 10 базовых вопросов
+      function showIntermediateReward() {
+        gameActive = false; // блокируем дальнейшие ответы, пока выбор не сделан
         const mainDiv = document.getElementById("gameMainArea");
-        if (win) {
-          burstConfetti("huge");
-          for (let i = 0; i < 3; i++)
-            setTimeout(() => burstConfetti("big"), i * 350);
-          mainDiv.innerHTML = `
-                <div class="final-panel">
-                    <div class="final-box" style="background: gold; color:#2d2b1f;">
-                        🎉✨ ПОБЕДА! ✨🎉<br>
-                        Вы ответили правильно на ВСЕ вопросы!<br>
-                        🏆 ВЫ ВЫИГРАЛИ 100$! 🏆<br>
-                        Спасибо, что путешествуете с нами по Осетии!
-                    </div>
-                    <button class="restart-btn" id="restartGameBtn">🔄 Пройти викторину снова</button>
-                </div>
-            `;
-        } else {
-          mainDiv.innerHTML = `
-                <div class="final-panel">
-                    <div class="final-box" style="background: #fff2e0;">
-                        📚 Викторина завершена!<br>
-                        Правильных ответов: ${correctCount} из ${total}<br>
-                        ${mistakeCount === 1 ? "Вы допустили одну ошибку, но 100$ все равно забираете" : "Изучайте Осетию дальше — здесь столько интересного!"}
-                    </div>
-                    <button class="restart-btn" id="restartGameBtn">🔄 Начать заново</button>
-                </div>
-            `;
+        mainDiv.innerHTML = `
+          <div class="reward-panel">
+            <div class="final-box" style="background: gold; color:#2d2b1f;">
+              🎉 Поздравляем! 🎉<br>
+              Вы ответили правильно на 9 или 10 вопросов из 10 (допустили не более одной ошибки).<br>
+              Вы выиграли 50$!
+            </div>
+            <div class="reward-buttons">
+              <button class="reward-btn" id="takeMoneyBtn">💵 Забрать 50$</button>
+              <button class="reward-btn" id="continueGameBtn">🎲 Продолжить игру и удвоить выигрыш</button>
+            </div>
+          </div>
+        `;
+        document
+          .getElementById("takeMoneyBtn")
+          .addEventListener("click", () => {
+            burstConfetti("huge");
+            for (let i = 0; i < 3; i++)
+              setTimeout(() => burstConfetti("big"), i * 350);
+            mainDiv.innerHTML = `
+            <div class="final-panel">
+              <div class="final-box" style="background: gold; color:#2d2b1f;">
+                🎉✨ ПОБЕДА! ✨🎉<br>
+                Вы выиграли 50$!<br>
+                Спасибо за игру!
+              </div>
+              <button class="restart-btn" id="restartGameBtn">🔄 Пройти викторину снова</button>
+            </div>
+          `;
+            document
+              .getElementById("restartGameBtn")
+              ?.addEventListener("click", () => location.reload());
+          });
+        document
+          .getElementById("continueGameBtn")
+          .addEventListener("click", () => {
+            // Начать супер-игру: добавить супер-вопрос в массив, сбросить состояние
+            questions = [...baseQuestions, superQuestion];
+            currentIndex = baseQuestions.length; // индекс 10 (первый после базовых)
+            userAnswers = new Array(questions.length).fill(null);
+            // Оставляем текущий mistakeCount (0 или 1), который был накоплен за базовую часть
+            // Сбрасываем флаги для супер-игры
+            answered = false;
+            waitingNext = false;
+            gameActive = true;
+            gameFinished = false;
+            superGameMode = true;
+            renderSuperGameStart();
+          });
+      }
+
+      function renderSuperGameStart() {
+        const mainDiv = document.getElementById("gameMainArea");
+        mainDiv.innerHTML = `
+          <div class="question-header">
+            <div class="super-game-message">🔥 СУПЕР ИГРА 🔥</div>
+          </div>
+          <div class="next-area">
+            <button class="next-btn active" id="startSuperBtn">➡️ НАЧАТЬ</button>
+          </div>
+        `;
+        document
+          .getElementById("startSuperBtn")
+          .addEventListener("click", () => {
+            renderCurrentQuestion();
+          });
+      }
+
+      function finishGameWithLoss() {
+        let correctCount = 0;
+        for (let i = 0; i < baseQuestions.length; i++) {
+          if (userAnswers[i] === baseQuestions[i].correct) correctCount++;
         }
+        const mainDiv = document.getElementById("gameMainArea");
+        mainDiv.innerHTML = `
+          <div class="final-panel">
+            <div class="final-box" style="background: #fff2e0;">
+              📚 Викторина завершена!<br>
+              Правильных ответов: ${correctCount} из ${baseQuestions.length}<br>
+              ${mistakeCount === 1 ? "Вы допустили одну ошибку, но для выигрыша необходимо 9 правильных ответов." : "Изучайте Осетию дальше — здесь столько интересного!"}
+            </div>
+            <button class="restart-btn" id="restartGameBtn">🔄 Начать заново</button>
+          </div>
+        `;
         document
           .getElementById("restartGameBtn")
           ?.addEventListener("click", () => location.reload());
+        gameActive = false;
+        gameFinished = true;
       }
 
-      // Отрисовка текущего вопроса
       function renderCurrentQuestion() {
         if (!gameActive) return;
         const q = questions[currentIndex];
@@ -576,15 +714,15 @@
 
         const mainDiv = document.getElementById("gameMainArea");
         mainDiv.innerHTML = `
-            <div class="question-header">
-                <div class="question-counter">Вопрос ${qNumber} / ${total}</div>
-                <div class="question-text">${escapeHtml(q.text)}</div>
-            </div>
-            <div class="answers-grid" id="answersGrid"></div>
-            <div class="next-area">
-                <button class="next-btn" id="nextBtn" disabled>➡️ ДАЛЬШЕ</button>
-            </div>
-            <div class="result-message" id="resultMsg"></div>
+          <div class="question-header">
+            <div class="question-counter">Вопрос ${qNumber} / ${total}</div>
+            <div class="question-text">${escapeHtml(q.text)}</div>
+          </div>
+          <div class="answers-grid" id="answersGrid"></div>
+          <div class="next-area">
+            <button class="next-btn" id="nextBtn" disabled>➡️ ДАЛЬШЕ</button>
+          </div>
+          <div class="result-message" id="resultMsg"></div>
         `;
 
         const answersGrid = document.getElementById("answersGrid");
@@ -604,7 +742,7 @@
         answered = false;
         waitingNext = false;
 
-        // Если ранее была показана надпись супер-игры, удаляем её, чтобы не дублировать
+        // Убираем возможные старые сообщения супер-игры
         const existingSuper = document.querySelector(".super-game-message");
         if (existingSuper) existingSuper.remove();
       }
@@ -620,14 +758,15 @@
 
       // Инициализация
       function initGame() {
+        questions = [...baseQuestions];
         currentIndex = 0;
-        userAnswers.fill(null);
+        userAnswers = new Array(questions.length).fill(null);
         answered = false;
         waitingNext = false;
         gameActive = true;
         gameFinished = false;
         mistakeCount = 0;
-        superGameShown = false;
+        superGameMode = false;
         renderCurrentQuestion();
       }
 
@@ -635,3 +774,4 @@
     </script>
   </body>
 </html>
+```
