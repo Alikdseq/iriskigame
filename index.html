@@ -14,8 +14,17 @@
         box-sizing: border-box;
       }
 
+      /* Триколор: белый, красный, жёлтый (равные полосы) */
       body {
-        background: linear-gradient(145deg, #2d2b28 0%, #1f1e1b 100%);
+        background: linear-gradient(
+          to bottom,
+          #ffffff 0%,
+          #ffffff 33.33%,
+          #da1c2f 33.33%,
+          #da1c2f 66.66%,
+          #ffcd00 66.66%,
+          #ffcd00 100%
+        );
         font-family: "Segoe UI", "Inter", "Poppins", system-ui, sans-serif;
         min-height: 100vh;
         display: flex;
@@ -24,18 +33,18 @@
         padding: 20px;
       }
 
+      /* Карточка с полупрозрачным фоном, чтобы фон был виден, но текст читаем */
       .quiz-card {
         max-width: 800px;
         width: 100%;
-        background: rgba(249, 241, 227, 0.95);
+        background: rgba(30, 27, 22, 0.85);
+        backdrop-filter: blur(3px);
         border-radius: 48px;
-        backdrop-filter: blur(2px);
-        box-shadow:
-          0 30px 45px rgba(0, 0, 0, 0.4),
-          inset 0 1px 4px rgba(255, 255, 200, 0.6);
+        box-shadow: 0 30px 45px rgba(0, 0, 0, 0.5);
         padding: 28px 24px 36px;
-        border: 2px solid #e1b87c;
+        border: 2px solid #ffcd00;
         transition: 0.3s;
+        color: #fff7e8;
       }
 
       .ornament {
@@ -47,7 +56,7 @@
       .ornament span {
         width: 40px;
         height: 4px;
-        background: #b37b2e;
+        background: #ffcd00;
         border-radius: 4px;
       }
 
@@ -56,8 +65,8 @@
         margin-bottom: 28px;
       }
       .question-counter {
-        background: #b37b2e;
-        color: white;
+        background: #da1c2f;
+        color: #ffefcf;
         display: inline-block;
         padding: 6px 24px;
         border-radius: 40px;
@@ -73,11 +82,10 @@
         font-size: 1.7rem;
         font-weight: 800;
         line-height: 1.3;
-        color: #2c2a24;
-        background: rgba(255, 250, 235, 0.8);
+        background: rgba(0, 0, 0, 0.6);
         padding: 20px 18px;
         border-radius: 40px;
-        text-shadow: 0 1px 0 white;
+        text-shadow: 0 1px 2px black;
       }
 
       .answers-grid {
@@ -87,32 +95,32 @@
         margin: 32px 0 28px;
       }
       .answer-btn {
-        background: #4a3a28;
+        background: #3a2c1f;
         border: none;
         padding: 16px 12px;
         border-radius: 60px;
         font-size: 1rem;
         font-weight: 600;
-        color: #fef3e0;
+        color: #fff1df;
         cursor: pointer;
         transition: all 0.2s;
         text-align: center;
-        box-shadow: 0 5px 0 #2d241b;
+        box-shadow: 0 5px 0 #1f1a12;
         font-family: inherit;
       }
       .answer-btn:hover:not(:disabled) {
-        background: #6b4f34;
+        background: #5f4630;
         transform: translateY(-2px);
-        box-shadow: 0 7px 0 #2d241b;
+        box-shadow: 0 7px 0 #1f1a12;
       }
       .answer-btn.correct-highlight {
-        background: #2a7346 !important;
+        background: #1f8a4c !important;
         box-shadow: 0 0 12px #7be2a5;
         border: 1px solid #c2ffc2;
         color: white;
       }
       .answer-btn.wrong-highlight {
-        background: #b53b2a !important;
+        background: #b32e1c !important;
         text-decoration: line-through;
         box-shadow: 0 0 8px #ff7f5c;
       }
@@ -127,7 +135,7 @@
         margin: 10px 0 15px;
       }
       .next-btn {
-        background: linear-gradient(95deg, #d78e2c, #b56f1a);
+        background: linear-gradient(95deg, #ffcd00, #e5b800);
         border: none;
         padding: 12px 40px;
         border-radius: 80px;
@@ -136,7 +144,7 @@
         color: #2d2a1f;
         cursor: pointer;
         transition: 0.2s;
-        box-shadow: 0 6px 0 #734f16;
+        box-shadow: 0 6px 0 #a77c00;
         display: inline-block;
         opacity: 0.6;
         pointer-events: none;
@@ -148,9 +156,9 @@
         cursor: pointer;
       }
       .next-btn.active:hover {
-        background: #f0a22e;
+        background: #ffde5c;
         transform: translateY(-2px);
-        box-shadow: 0 8px 0 #734f16;
+        box-shadow: 0 8px 0 #a77c00;
       }
 
       .result-message {
@@ -158,10 +166,35 @@
         font-size: 1rem;
         margin-top: 12px;
         font-weight: 600;
-        background: rgba(0, 0, 0, 0.6);
+        background: rgba(0, 0, 0, 0.7);
         padding: 10px;
         border-radius: 40px;
         color: #ffefc0;
+      }
+
+      .super-game-message {
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: 800;
+        background: #ffcd00;
+        color: #8b2c1d;
+        padding: 12px;
+        border-radius: 60px;
+        margin: 20px 0 10px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        animation: pulse 1s infinite alternate;
+      }
+      @keyframes pulse {
+        from {
+          transform: scale(1);
+          background: #ffcd00;
+        }
+        to {
+          transform: scale(1.02);
+          background: #ffe55c;
+        }
       }
 
       .final-panel {
@@ -178,7 +211,7 @@
         box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
       }
       .restart-btn {
-        background: #e1a22c;
+        background: #ffcd00;
         border: none;
         padding: 12px 35px;
         border-radius: 50px;
@@ -188,10 +221,10 @@
         cursor: pointer;
         transition: 0.2s;
         color: #1f2a13;
-        box-shadow: 0 4px 0 #9b6018;
+        box-shadow: 0 4px 0 #b87d00;
       }
       .restart-btn:hover {
-        background: #f7b649;
+        background: #ffde6e;
         transform: translateY(-2px);
       }
 
@@ -199,7 +232,8 @@
         text-align: center;
         font-size: 0.7rem;
         margin-top: 28px;
-        color: #b5926a;
+        color: #fff0c0;
+        text-shadow: 0 1px 0 #00000066;
       }
       canvas {
         position: fixed;
@@ -219,6 +253,9 @@
           font-size: 0.85rem;
           padding: 12px;
         }
+        .super-game-message {
+          font-size: 1.2rem;
+        }
       }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
@@ -236,92 +273,73 @@
     </div>
 
     <script>
-      // Вопросы и ответы (согласно предоставленному списку)
+      // Вопросы согласно списку (с правильными индексами)
       const questions = [
         {
-          text: "Как называется столица Республики Северная Осетия — Алания?",
-          options: ["Пятигорск", "Магас", "Владикавказ", "Нальчик"],
-          correct: 2,
-        },
-        {
-          text: "Как называется знаменитый осетинский пирог с мясом?",
-          options: ["Улибах", "Цахараджин", "Фыджин", "Картофджин"],
-          correct: 2,
-        },
-        {
-          text: "Какая река протекает через город Владикавказ?",
-          options: ["Урсдон", "Терек", "Сунжа", "Дон"],
-          correct: 1,
-        },
-        {
-          text: "Кто считается основоположником осетинской литературы и «солнцем осетинской поэзии»?",
+          text: "Какой вид спорта считается «номером один» в Осетии по количеству олимпийских чемпионов?",
           options: [
-            "Гайто Газданов",
-            "Коста Хетагуров",
-            "Исса Плиев",
-            "Васо Абаев",
+            "Футбол",
+            "Тяжелая атлетика",
+            "Фехтование",
+            "Вольная борьба",
           ],
+          correct: 3,
+        },
+        {
+          text: "Какое старинное название носит массовый осетинский танец-шествие?",
+          options: ["Лезгинка", "Симд", "Хонга", "Алан"],
           correct: 1,
         },
         {
           text: "Как называется высочайший водопад Осетии (и один из самых высоких в Европе), расположенный в Мидаграбинской долине?",
-          options: ["Султан", "Большой Зейгалан", "Девичьи косы", "Медовый"],
-          correct: 1,
+          options: ["Султан", "Медовый", "Девичьи косы", "Большой Зейгалан"],
+          correct: 3,
         },
         {
-          text: "В каком году произошло официальное присоединение Осетии к Российской империи?",
-          options: ["1747", "1774", "1871", "1744"],
-          correct: 1,
-        },
-        {
-          text: "Кто из осетинских военачальников стал единственным в истории СССР дважды Героем Советского Союза и Героем Монгольской Народной Республики?",
-          options: [
-            "Хаджи-Умар Мамсуров",
-            "Георгий Хетагуров",
-            "Исса Плиев",
-            "Энвер Ахсаров",
-          ],
-          correct: 2,
-        },
-        {
-          text: "В каком селе находится знаменитый «Город мертвых» — крупнейший склеповый могильник на Кавказе?",
-          options: ["Фиагдон", "Цей", "Даргавс", "Дигора"],
-          correct: 2,
-        },
-        {
-          text: "Как назывался город Владикавказ в советский период (с 1954 по 1990 гг.)?",
-          options: ["Сталинград", "Орджоникидзе", "Дзауджикау", "Киров"],
-          correct: 1,
-        },
-        {
-          text: "К какой языковой группе относится осетинский язык?",
-          options: [
-            "Тюркской",
-            "Нахско-дагестанской",
-            "Иранской",
-            "Картвельской",
-          ],
-          correct: 2,
-        },
-        {
-          text: "Какая вершина является самой высокой точкой Северной Осетии (4780 м)?",
-          options: ["Казбек", "Тепли", "Джимара", "Уилпата"],
-          correct: 2,
-        },
-        {
-          text: "Как называлась столица средневековой Алании, точное местоположение которой до сих пор является предметом споров ученых?",
-          options: ["Маас", "Саркел", "Тмутаракань", "Итиль"],
+          text: "Как называется самое глубокое карстовое озеро в Осетии?",
+          options: ["Церик-Кёль", "Зеркальное", "Хуцъе", "Колка"],
           correct: 0,
         },
         {
-          text: "Какой ученый-лингвист посвятил всю жизнь составлению четырехтомного «Историко-этимологического словаря осетинского языка»?",
+          text: "Какое ущелье Осетии печально известно из-за схода ледника Колка в 2002 году?",
+          options: ["Фиагдонское", "Кармадонское", "Дигорское", "Кобанское"],
+          correct: 1,
+        },
+        {
+          text: "Как назывался первый профессиональный осетинский театр, открывшийся во Владикавказе?",
+          options: ["Ирон", "Нарт", "Коста", "Алан"],
+          correct: 2,
+        },
+        {
+          text: "Какой генерал-полковник, осетин по национальности, прославился как легендарный разведчик под псевдонимом «Ксанти»?",
           options: [
-            "Борис Калоев",
-            "Василий (Васо) Абаев",
-            "Андрей Шёгрен",
-            "Коста Хетагуров",
+            "Исса Плиев",
+            "Хаджи-Умар Мамсуров",
+            "Георгий Хетагуров",
+            "Каурбек Черевиков",
           ],
           correct: 1,
+        },
+        // Супер игра — следующие вопросы
+        {
+          text: "В каком году во Владикавказе был открыт первый на Кавказе трамвай?",
+          options: ["1890", "1904", "1917", "1925"],
+          correct: 1,
+        },
+        {
+          text: "Какой российский император посетил Владикавказ в 1888 году?",
+          options: ["Николай I", "Николай II", "Александр II", "Александр III"],
+          correct: 3,
+        },
+        {
+          text: "Как называлась первая газета на осетинском языке, вышедшая в 1906 году?",
+          options: [
+            "«Ирон газет»",
+            "«Рæстдзинад»",
+            "«Стыр Ныхас»",
+            "«Сев. Осетия»",
+          ],
+          correct: 0,
         },
       ];
 
@@ -334,8 +352,9 @@
       let gameFinished = false;
       let mistakeCount = 0; // количество ошибок
       const MAX_MISTAKES = 1; // разрешена только 1 ошибка, вторая заканчивает игру
+      let superGameShown = false; // флаг, чтобы показать надпись только один раз после 7-го вопроса
 
-      // Функция для салюта (confetti)
+      // Функция для салюта
       function burstConfetti(intensity = "medium") {
         if (typeof canvasConfetti === "undefined") return;
         let count = 150,
@@ -354,7 +373,7 @@
           spread,
           origin,
           startVelocity: 20,
-          colors: ["#f5b042", "#2ecc71", "#3498db", "#f1c40f"],
+          colors: ["#ffcd00", "#da1c2f", "#ffffff", "#f1c40f"],
         });
         if (intensity === "huge") {
           setTimeout(
@@ -431,13 +450,11 @@
         if (!isCorrect) {
           mistakeCount++;
           if (mistakeCount === 1) {
-            // первая ошибка – предупреждение, но игра продолжается
+            // первая ошибка – предупреждение
             document.getElementById("resultMsg").innerHTML =
               "⚠️ Одна ошибка прощается! Следующая ошибка завершит игру. ⚠️";
             document.getElementById("resultMsg").style.color = "#ffbc9a";
-            // небольшой салют не делаем, просто сообщение
           } else if (mistakeCount >= 2) {
-            // вторая ошибка – конец игры
             gameOverLose();
             return;
           }
@@ -460,6 +477,33 @@
       // Переход к следующему вопросу
       function goToNext() {
         if (!gameActive || !waitingNext || gameFinished) return;
+
+        // Если только что завершили 7-й вопрос (индекс 6) и ещё не показывали надпись, добавляем "СУПЕР ИГРА"
+        if (currentIndex === 6 && !superGameShown) {
+          superGameShown = true;
+          // Показываем сообщение о супер-игре
+          const resultDiv = document.getElementById("resultMsg");
+          const superDiv = document.createElement("div");
+          superDiv.className = "super-game-message";
+          superDiv.innerText = "🔥 СУПЕР ИГРА 🔥";
+          // Вставляем перед областью ответов (после результата)
+          const nextArea = document.querySelector(".next-area");
+          const existingSuper = document.querySelector(".super-game-message");
+          if (existingSuper) existingSuper.remove();
+          nextArea.parentNode.insertBefore(superDiv, nextArea);
+          // небольшой салют для эффекта
+          burstConfetti("big");
+          // задержка перед переходом к следующему вопросу, чтобы игрок увидел сообщение
+          setTimeout(() => {
+            proceedToNext();
+          }, 1500);
+          return;
+        }
+
+        proceedToNext();
+      }
+
+      function proceedToNext() {
         if (currentIndex + 1 < questions.length) {
           currentIndex++;
           answered = false;
@@ -492,7 +536,6 @@
 
         const mainDiv = document.getElementById("gameMainArea");
         if (win) {
-          // масштабный салют
           burstConfetti("huge");
           for (let i = 0; i < 3; i++)
             setTimeout(() => burstConfetti("big"), i * 350);
@@ -513,7 +556,7 @@
                     <div class="final-box" style="background: #fff2e0;">
                         📚 Викторина завершена!<br>
                         Правильных ответов: ${correctCount} из ${total}<br>
-                        ${mistakeCount === 1 ? "Вы допустили одну ошибку, но 100$ все равно получаете!" : "Изучайте Осетию дальше — здесь столько интересного!"}
+                        ${mistakeCount === 1 ? "Вы допустили одну ошибку, но 100$ все равно забираете" : "Изучайте Осетию дальше — здесь столько интересного!"}
                     </div>
                     <button class="restart-btn" id="restartGameBtn">🔄 Начать заново</button>
                 </div>
@@ -560,6 +603,10 @@
         document.getElementById("resultMsg").innerHTML = "";
         answered = false;
         waitingNext = false;
+
+        // Если ранее была показана надпись супер-игры, удаляем её, чтобы не дублировать
+        const existingSuper = document.querySelector(".super-game-message");
+        if (existingSuper) existingSuper.remove();
       }
 
       function escapeHtml(str) {
@@ -580,6 +627,7 @@
         gameActive = true;
         gameFinished = false;
         mistakeCount = 0;
+        superGameShown = false;
         renderCurrentQuestion();
       }
 
